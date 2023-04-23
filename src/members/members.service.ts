@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ApiResponse } from 'src/common/models/api-response.model';
 import { Repository } from 'typeorm';
 import { CreateMemberDto } from './dto/create-member.dto';
 import { GetMembersFilterDto } from './dto/get-members-filter.dto';
+import { SubscriptionRenewalDto } from './dto/subscription-renewal.dto';
+import { UpdateMemberDto } from './dto/update-member.dto';
 import { Member } from './member.entity';
 
 @Injectable()
@@ -33,22 +35,24 @@ export class MembersService {
             query.skip(offset).take(limit);
         }
 
-        // const members = await query
-        //   .leftJoin('project.po', 'userTable')
-        //   .addSelect([
-        //     'userTable.username',
-        //     'userTable.firstName',
-        //     'userTable.lastName',
-        //   ])
-        //   .leftJoin('project.members', 'user')
-        //   .addSelect(['user.username', 'user.firstName', 'user.lastName'])
-        //   .getMany();
         const members = await query.getMany();
 
         return {
             results: members,
             count,
         };
+    }
+
+    async getMemberById(id: string): Promise<Member> {
+        const member = await this.memberRepository.findOne({
+            where: { nationalCode: id }
+        });
+
+        if (member) {
+            return member;
+        } else {
+            throw new NotFoundException(`Member with national code ${id} not found.`)
+        }
     }
 
     async createMember(
@@ -59,5 +63,33 @@ export class MembersService {
         return {
             results: member,
         };
+    }
+
+    async updateMember(nationalCode: string, updateMemberDto: UpdateMemberDto): Promise<Member> {
+        const {fullName, address, mobile} = updateMemberDto;
+        const member = await this.getMemberById(nationalCode);
+        
+        member.fullName = fullName;
+        member.address = address;
+        member.mobile = mobile;
+        this.memberRepository.save(member);
+
+        return member;
+    }
+
+    async renewalSubscription(nationalCode: string, renewalDto: SubscriptionRenewalDto): Promise<Member> {
+        const member = await this.getMemberById(nationalCode);
+        member.registrationExpiry = renewalDto.expiryDate;
+        this.memberRepository.save(member);
+
+        return member;
+    } 
+
+    async delete(nationalCode: string): Promise<void> {
+        const result = await this.memberRepository.delete({nationalCode});
+        
+        if (result.affected === 0) {
+            throw new NotFoundException(`Member with National code ${nationalCode} not found.`);
+        }
     }
 }
