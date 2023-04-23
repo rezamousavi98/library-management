@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiResponse } from 'src/common/models/api-response.model';
+import { BaseFilterDto } from 'src/common/models/base-filter.model';
 import { CreateMemberDto } from './dto/create-member.dto';
-import { GetMembersFilterDto } from './dto/get-members-filter.dto';
 import { SubscriptionRenewalDto } from './dto/subscription-renewal.dto';
 import { UpdateMemberDto } from './dto/update-member.dto';
 import { Member } from './member.entity';
@@ -12,7 +12,7 @@ export class MembersController {
     constructor(private membersService: MembersService) {}
 
     @Get()
-    getMembers(@Query() getMembersFilterDto: GetMembersFilterDto): Promise<ApiResponse<Member[]>> {
+    getMembers(@Query() getMembersFilterDto: BaseFilterDto): Promise<ApiResponse<Member[]>> {
         return this.membersService.getMembers(getMembersFilterDto);
     }
 
@@ -22,7 +22,7 @@ export class MembersController {
     }
 
     @Post()
-    createMember(@Body() member: CreateMemberDto): Promise<ApiResponse<Member>> {
+    createMember(@Body() member: CreateMemberDto): Promise<Member> {
         return this.membersService.createMember(member);
     }
 
