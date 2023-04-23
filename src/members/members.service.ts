@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ApiResponse } from 'src/common/models/api-response.model';
+import { BaseFilterDto } from 'src/common/models/base-filter.model';
 import { Repository } from 'typeorm';
 import { CreateMemberDto } from './dto/create-member.dto';
-import { GetMembersFilterDto } from './dto/get-members-filter.dto';
 import { SubscriptionRenewalDto } from './dto/subscription-renewal.dto';
 import { UpdateMemberDto } from './dto/update-member.dto';
 import { Member } from './member.entity';
@@ -16,7 +16,7 @@ export class MembersService {
     ) { }
 
     async getMembers(
-        getMembersDto: GetMembersFilterDto,
+        getMembersDto: BaseFilterDto,
     ): Promise<ApiResponse<Member[]>> {
         const { search, limit, page } = getMembersDto;
         const query = this.memberRepository.createQueryBuilder('member');
@@ -57,12 +57,10 @@ export class MembersService {
 
     async createMember(
         createMemberDto: CreateMemberDto,
-    ): Promise<ApiResponse<Member>> {
+    ): Promise<Member> {
         const member = this.memberRepository.create(createMemberDto);
         await this.memberRepository.save(member);
-        return {
-            results: member,
-        };
+        return member;
     }
 
     async updateMember(nationalCode: string, updateMemberDto: UpdateMemberDto): Promise<Member> {

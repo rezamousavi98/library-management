@@ -1,3 +1,4 @@
+import { BooksModule } from './books/books.module';
 import { MembersModule } from './members/members.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -7,7 +8,6 @@ import { APP_FILTER } from '@nestjs/core';
 
 @Module({
   imports: [
-    MembersModule,
     ConfigModule.forRoot({
       envFilePath: [`.env`]
     }),
@@ -27,7 +27,8 @@ import { APP_FILTER } from '@nestjs/core';
         }
       }
     }),
-    MembersModule
+    MembersModule,
+    BooksModule,
   ],
   controllers: [],
   providers: [
