@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Borrowing } from "src/borrowing/borrowing.entity";
+import { Column, CreateDateColumn, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Subject } from "./dto/subject.model";
 
 @Entity()
@@ -44,4 +45,7 @@ export class Book {
 
     @UpdateDateColumn({type: 'timestamptz'})
     updatedAt: Date;
+
+    @ManyToMany(_type => Borrowing, borrowing => borrowing.books, {eager: false})
+    borrowList: Borrowing[]
 }

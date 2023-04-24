@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Borrowing } from "src/borrowing/borrowing.entity";
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Member {
@@ -25,4 +26,7 @@ export class Member {
 
     @UpdateDateColumn({type: 'timestamptz'})
     updatedAt: Date;
+
+    @OneToMany(_type => Borrowing, borrowing => borrowing.member, {eager: false})
+    borrowingList: Borrowing[];
 }
