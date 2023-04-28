@@ -59,7 +59,8 @@ export class BooksService {
     } else {
       const result = await this.updateInTrustCount(booksId, "increase");
       if (result.affected === booksId.length) {
-        return await query.getMany();
+        requestedBooks.forEach(book => book.inTrust += 1);
+        return requestedBooks;
       } else {
         throw new InternalServerErrorException();
       }
