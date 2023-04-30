@@ -1,6 +1,6 @@
 import { IsNotEmpty } from "class-validator";
 
-export class UpdateBorrowingDto {
+export class CloseBorrowingDto {
     @IsNotEmpty()
     returnedDate: Date;
 }

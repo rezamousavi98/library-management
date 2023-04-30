@@ -9,7 +9,7 @@ import { Borrowing } from './borrowing.entity';
 import { BorrowingStatus } from './dto/borrowing-status.model';
 import { CreateBorrowingDto } from './dto/create-borrowing.dto';
 import { GetBorrowingFilterDto } from './dto/get-borrowing-filter.dto';
-import { UpdateBorrowingDto } from './dto/update-borrowing.dto';
+import { CloseBorrowingDto } from './dto/update-borrowing.dto';
 
 @Injectable()
 export class BorrowingService {
@@ -23,7 +23,7 @@ export class BorrowingService {
   async getBorrowings(
     getBorrowingDto: GetBorrowingFilterDto,
   ): Promise<ApiResponse<Borrowing[]>> {
-    const { page, limit, status } = getBorrowingDto;
+    const { page, limit, status, member: memberId, order } = getBorrowingDto;
     const query = this.borrowingRepository
       .createQueryBuilder('borrowing')
       .leftJoin('borrowing.member', 'user')
@@ -31,6 +31,12 @@ export class BorrowingService {
       .leftJoin('borrowing.books', 'book')
       .addSelect(['book.title', 'book.isbn']);
     let count = await query.getCount();
+
+    if (memberId) {
+      const foundedMember = await this.memberService.getMemberById(memberId);
+      query.where({member: foundedMember});
+      count = await query.getCount();
+    }
 
     if (status) {
         query.andWhere('borrowing.status = :status', {
@@ -45,7 +51,7 @@ export class BorrowingService {
     }
 
     try {
-      const borrowings = await query.getMany();
+      const borrowings = await query.orderBy('borrowing.date', order ?? "DESC").getMany();
       return {
         results: borrowings,
         count,
@@ -92,7 +98,7 @@ export class BorrowingService {
 
   async updateBorrowing(
     id: number,
-    updateBorrowingDto: UpdateBorrowingDto,
+    updateBorrowingDto: CloseBorrowingDto,
   ): Promise<Borrowing> {
     const borrowing = await this.getBorrowingById(id);
     if (borrowing.status === 1) {
@@ -116,6 +122,18 @@ export class BorrowingService {
       throw new InternalServerErrorException(
         'You can not edit closed borrowings.',
       );
+    }
+  }
+
+  async getDebt(id: number, closeBorrowingDto: CloseBorrowingDto): Promise<number> {
+    const borrowing = await this.getBorrowingById(id);
+    const { returnedDate } = closeBorrowingDto;
+    const delay = borrowing.returnDate.getTime() - new Date(returnedDate).getTime();
+    if (delay >= 0 || borrowing.status === 0) {
+      return 0;
+    } else {
+      const days = Math.ceil((delay * -1) / 86400000);
+      return days * 4200;
     }
   }
 

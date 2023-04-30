@@ -5,7 +5,7 @@ import { Borrowing } from './borrowing.entity';
 import { BorrowingService } from './borrowing.service';
 import { CreateBorrowingDto } from './dto/create-borrowing.dto';
 import { GetBorrowingFilterDto } from './dto/get-borrowing-filter.dto';
-import { UpdateBorrowingDto } from './dto/update-borrowing.dto';
+import { CloseBorrowingDto } from './dto/update-borrowing.dto';
 
 @Controller('api/borrowing')
 export class BorrowingController {
@@ -21,13 +21,18 @@ export class BorrowingController {
         return this.borrowingService.getBorrowingById(id);
     }
 
+    @Get(':id/debt')
+    getDebt(@Param('id') id: number, @Body() closeBorrowingDto: CloseBorrowingDto): Promise<number> {
+        return this.borrowingService.getDebt(id, closeBorrowingDto);
+    }
+
     @Post()
     createBorrowing(@Body() createBorrowingDto: CreateBorrowingDto): Promise<Borrowing> {
         return this.borrowingService.createBorrowing(createBorrowingDto);
     }
 
     @Patch(':id/close')
-    updateBorrowing(@Param('id') id: number, @Body() updateBorrowingDto: UpdateBorrowingDto): Promise<Borrowing> {
+    updateBorrowing(@Param('id') id: number, @Body() updateBorrowingDto: CloseBorrowingDto): Promise<Borrowing> {
         return this.borrowingService.updateBorrowing(id, updateBorrowingDto);
     }
 
