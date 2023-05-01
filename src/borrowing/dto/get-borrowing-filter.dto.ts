@@ -3,6 +3,7 @@ import { BorrowingStatus } from "./borrowing-status.model";
 
 export class GetBorrowingFilterDto extends BaseFilterDto {
     status?: BorrowingStatus;
-    member?: string;
+    memberId?: string;
+    bookId?: number;
     order?: "DESC" | "ASC";
 }

@@ -23,18 +23,22 @@ export class BorrowingService {
   async getBorrowings(
     getBorrowingDto: GetBorrowingFilterDto,
   ): Promise<ApiResponse<Borrowing[]>> {
-    const { page, limit, status, member: memberId, order } = getBorrowingDto;
+    const { page, limit, status, memberId, bookId, order } = getBorrowingDto;
     const query = this.borrowingRepository
       .createQueryBuilder('borrowing')
       .leftJoin('borrowing.member', 'user')
       .addSelect(['user.nationalCode', 'user.fullName'])
       .leftJoin('borrowing.books', 'book')
-      .addSelect(['book.title', 'book.isbn']);
+      .addSelect(['book.title', 'book.isbn', 'book.id']);
     let count = await query.getCount();
 
     if (memberId) {
-      const foundedMember = await this.memberService.getMemberById(memberId);
-      query.where({member: foundedMember});
+      query.where('user.nationalCode = :nationalCode', {nationalCode: memberId});
+      count = await query.getCount();
+    }
+
+    if (bookId) {
+      query.where('book.id = :bookId', { bookId });
       count = await query.getCount();
     }
 
