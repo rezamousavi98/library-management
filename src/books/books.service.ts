@@ -53,13 +53,13 @@ export class BooksService {
 
     const requestedBooks = await query.getMany();
 
-    const unAvailableBooks = requestedBooks.filter(b => b.count - b.inTrust === 0);
+    const unAvailableBooks = requestedBooks.filter(b => b.count - b.onLoan === 0);
     if (unAvailableBooks.length) {
       throw new NotFoundException(`These books are in trust: ${unAvailableBooks.map(b => b.title).join(' | ')}`);
     } else {
-      const result = await this.updateInTrustCount(booksId, "increase");
+      const result = await this.updateOnLoanCount(booksId, "increase");
       if (result.affected === booksId.length) {
-        requestedBooks.forEach(book => book.inTrust += 1);
+        requestedBooks.forEach(book => book.onLoan += 1);
         return requestedBooks;
       } else {
         throw new InternalServerErrorException();
@@ -67,11 +67,11 @@ export class BooksService {
     }
   }
 
-  async updateInTrustCount(booksId: number[], action: "increase" | "decrease"): Promise<UpdateResult> {
+  async updateOnLoanCount(booksId: number[], action: "increase" | "decrease"): Promise<UpdateResult> {
     return await this.bookRepository
     .createQueryBuilder('book')
     .update(Book)
-    .set({ inTrust: () => action === "increase" ? 'inTrust + 1' : 'inTrust - 1' })
+    .set({ onLoan: () => action === "increase" ? 'onLoan + 1' : 'onLoan - 1' })
     .where('book.id IN (:...id)', { id: booksId })
     .execute();
   }

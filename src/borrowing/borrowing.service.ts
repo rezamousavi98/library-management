@@ -109,7 +109,7 @@ export class BorrowingService {
       borrowing.returnedDate = updateBorrowingDto.returnedDate;
       borrowing.status = 0;
       try {
-        const updateooks = await this.bookService.updateInTrustCount(
+        const updateooks = await this.bookService.updateOnLoanCount(
           borrowing.books.map((book) => book.id),
           'decrease',
         );
@@ -145,7 +145,7 @@ export class BorrowingService {
     const borrowing = await this.getBorrowingById(id);
     if (borrowing.status === 1) {
       try {
-        const updateBooks = await this.bookService.updateInTrustCount(
+        const updateBooks = await this.bookService.updateOnLoanCount(
           borrowing.books.map((book) => book.id),
           'decrease',
         );

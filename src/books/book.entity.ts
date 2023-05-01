@@ -38,7 +38,7 @@ export class Book {
     count: number;
 
     @Column({default: 0})
-    inTrust: number;
+    onLoan: number;
 
     @CreateDateColumn({type: 'timestamptz'})
     createdAt: Date;
