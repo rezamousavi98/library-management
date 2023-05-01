@@ -1,3 +1,4 @@
+import { BorrowingModule } from './borrowing/borrowing.module';
 import { BooksModule } from './books/books.module';
 import { MembersModule } from './members/members.module';
 import { Module } from '@nestjs/common';
@@ -29,6 +30,7 @@ import { APP_FILTER } from '@nestjs/core';
     }),
     MembersModule,
     BooksModule,
+    BorrowingModule,
   ],
   controllers: [],
   providers: [
