@@ -7,8 +7,8 @@ export class UpdateMemberDto {
 
     @IsNotEmpty()
     @IsString()
-    @MinLength(11, { message: 'national code should contain 11 characters.'})
-    @MaxLength(11, { message: 'national code should contain 11 characters.'})
+    @MinLength(11, { message: 'mobile number should contain 11 characters.'})
+    @MaxLength(11, { message: 'mobile number should contain 11 characters.'})
     mobile: string;
 
     @IsNotEmpty()
