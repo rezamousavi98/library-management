@@ -21,7 +21,7 @@ export class BorrowingController {
         return this.borrowingService.getBorrowingById(id);
     }
 
-    @Get(':id/debt')
+    @Post(':id/debt')
     getDebt(@Param('id') id: number, @Body() closeBorrowingDto: CloseBorrowingDto): Promise<number> {
         return this.borrowingService.getDebt(id, closeBorrowingDto);
     }
