@@ -1,16 +1,16 @@
 import { Body, Controller, Get, Param, Post, Delete, Query, Put } from '@nestjs/common';
 import { ApiResponse } from 'src/common/models/api-response.model';
-import { BaseFilterDto } from 'src/common/models/base-filter.model';
 import { Book } from './book.entity';
 import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/create-book.dto';
+import { GetBooksFilterDto } from './dto/get-books-filter.dto';
 
 @Controller('api/books')
 export class BooksController {
     constructor(private bookService: BooksService) {}
 
     @Get()
-    getBooks(@Query() getBooksFilterDto: BaseFilterDto): Promise<ApiResponse<Book[]>> {
+    getBooks(@Query() getBooksFilterDto: GetBooksFilterDto): Promise<ApiResponse<Book[]>> {
         return this.bookService.getBooks(getBooksFilterDto);
     }
 

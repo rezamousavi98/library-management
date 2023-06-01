@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InternalServerErrorException, NotFoundException } from '@nestjs/common/exceptions';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ApiResponse } from 'src/common/models/api-response.model';
-import { BaseFilterDto } from 'src/common/models/base-filter.model';
 import { Repository, UpdateResult } from 'typeorm';
 import { Book } from './book.entity';
 import { CreateBookDto } from './dto/create-book.dto';
+import { GetBooksFilterDto } from './dto/get-books-filter.dto';
 
 @Injectable()
 export class BooksService {
@@ -19,9 +19,9 @@ export class BooksService {
   }
 
   async getBooks(
-    getBooksFilterDto: BaseFilterDto,
+    getBooksFilterDto: GetBooksFilterDto,
   ): Promise<ApiResponse<Book[]>> {
-    const { search, limit, page } = getBooksFilterDto;
+    const { search, limit, page, status } = getBooksFilterDto;
     const query = this.bookRepository.createQueryBuilder('book');
     let count = await query.getCount();
 
@@ -38,7 +38,16 @@ export class BooksService {
       query.skip(offset).take(limit);
     }
 
-    const books = await query.getMany();
+    let books = await query.getMany();
+
+    if (status) {
+      if (status === "available") {
+        books = books.filter(book => book.count - book.onLoan > 0);
+      } else if (status === "onLoan") {
+        books = books.filter(book => book.count - book.onLoan === 0);
+      }
+      count = books.length;
+    }
 
     return {
       results: books,
