@@ -6,6 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CustomExceptionsFilter } from './common/utils/custom-exception.filter';
 import { APP_FILTER } from '@nestjs/core';
+import { ReportsModule } from './reports/reports.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { APP_FILTER } from '@nestjs/core';
     MembersModule,
     BooksModule,
     BorrowingModule,
+    ReportsModule
   ],
   controllers: [],
   providers: [
